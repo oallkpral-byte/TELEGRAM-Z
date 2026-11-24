@@ -1,34 +1,39 @@
-name: Build TELEGRAM X
+name: Build TELEGRAM X for Windows
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Install Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          cache: true
 
-      - name: Enable Windows
+      - name: Enable Windows desktop
         run: flutter config --enable-windows-desktop
+
+      # В проекте нет папки windows/ — создаём её (lib/ и pubspec.yaml не трогаются)
+      - name: Generate Windows platform files
+        run: flutter create --platforms=windows --project-name telegram_x .
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build EXE
+      - name: Build Windows release
         run: flutter build windows --release
 
-      - name: Upload EXE files
+      - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
           name: TELEGRAM-X-Windows
           path: build/windows/x64/runner/Release/
+          if-no-files-found: error

@@ -1,0 +1,37 @@
+name: Build TELEGRAM X for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+        # Backend keys are intentionally not embedded yet.
+        # Add GitHub Actions secrets and dart-defines after Supabase is configured.
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TELEGRAM-X-Windows
+          path: build/windows/x64/runner/Release/
+          if-no-files-found: error

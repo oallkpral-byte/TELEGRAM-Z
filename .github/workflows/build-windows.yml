@@ -1,0 +1,34 @@
+name: Build TELEGRAM X
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Enable Windows
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build EXE
+        run: flutter build windows --release
+
+      - name: Upload EXE files
+        uses: actions/upload-artifact@v4
+        with:
+          name: TELEGRAM-X-Windows
+          path: build/windows/x64/runner/Release/
